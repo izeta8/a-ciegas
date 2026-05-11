@@ -53,16 +53,53 @@
 | user_id | uuid | REFERENCES profiles(id), RLS policy |
 | misses | integer | NOT NULL, CHECK >= 0 |
 | total_cards | integer | NOT NULL, DEFAULT 40 |
+| deck | jsonb | NOT NULL, contains Card[] array |
+| current_card_index | integer | NOT NULL, DEFAULT 0 |
+| game_status | text | NOT NULL, DEFAULT 'in_progress' (values: 'in_progress', 'completed', 'abandoned') |
 | created_at | timestamptz | DEFAULT now() |
+| updated_at | timestamptz | DEFAULT now() |
+
+**Game Status Values:**
+- `in_progress`: Game is active and can be resumed
+- `completed`: User finished the game (deck exhausted)
+- `abandoned`: User voluntarily quit the game
 
 ### Row Level Security
 - profiles: Users can only read/update their own profile
 - games: Users can only read/write their own games, public can read top scores
 
+## Game Flow & State Management
+
+### Game Session Rules
+1. **Anonymous users**: Game state is stored in localStorage. Leaving the page clears the session.
+2. **Authenticated users**: Game state is persisted to Supabase. Users can resume from where they left off.
+3. **Abandoning a game**: If a user clicks "Abandonar" (quit), the game is marked as `abandoned` and deleted. They start fresh next time.
+4. **Completing a game**: When deck is exhausted, game is marked as `completed` and score is recorded.
+5. **Only one active game**: Users can only have ONE game in `in_progress` status at a time.
+
+### State Persistence Flow
+```
+User starts game → Create game in DB with deck + current_index → Play → Each move updates deck_index + misses
+User quits → Game marked as abandoned → Deleted
+User finishes → Game marked as completed → Score saved → New game available
+User returns → Check for in_progress game → Resume or create new
+```
+
+### Game End UX Best Practices
+When a game ends (deck exhausted):
+1. **Celebration/Results overlay**: Modal or overlay showing final score
+2. **Visual hierarchy**: Miss count prominently displayed
+3. **Comparison**: Show how many misses vs. best score (if applicable)
+4. **Actions available**:
+   - "Nueva Partida" → Start fresh game
+   - "Ver Clasificación" → Go to leaderboard (future feature)
+5. **Emotional design**: Subtle animations (confetti for low misses, encouraging message)
+6. **Clear exit**: User knows exactly what to do next
+
 ## Current Roadmap
 
 ### TODO
-- [ ] Phase 4: Supabase integration (Auth + Database)
+- [ ] Phase 4: Supabase integration (Auth + Database + State Persistence)
 - [ ] Phase 5: Sound effects and haptic feedback
 
 ### DOING
@@ -71,7 +108,8 @@
 ### DONE
 - [x] Phase 1: Setup Next.js, Shadcn, and AGENTS.md
 - [x] Phase 2: Core game engine (deck, shuffling, comparison logic)
-- [x] Phase 3: Visual polish (Framer Motion card animations, mobile-first responsive design)
+- [x] Phase 3: Visual polish (Framer Motion card animations, mobile-first responsive design, Fournier card back)
+- [x] Phase 3.5: Game flow improvements (abandon button, game end UX)
 - [ ] Phase 4: Supabase auth and scoreboard
 - [ ] Phase 5: Polish (sound effects, desktop optimizations)
 
@@ -100,6 +138,11 @@
 
 Example: `/public/cards/1_oros.png`, `/public/cards/12_bastos.png`
 
+**Card Back Design:** `/public/cards/back.svg`
+- Style: Fournier classic
+- Color scheme: Dark burgundy with gold accents
+- Design: Geometric pattern with hexagonal motifs and cross emblem
+
 ## Project Structure
 
 ```
@@ -113,11 +156,14 @@ a-ciegas/
 │   ├── components/
 │   │   ├── ui/
 │   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
 │   │   │   └── progress.tsx
 │   │   ├── Card.tsx
 │   │   ├── CardTable.tsx
 │   │   ├── PredictionButtons.tsx
-│   │   └── ScoreDisplay.tsx
+│   │   ├── ScoreDisplay.tsx
+│   │   ├── GameEndModal.tsx
+│   │   └── QuitConfirmation.tsx
 │   ├── hooks/
 │   │   └── useGame.ts
 │   ├── lib/
@@ -130,13 +176,14 @@ a-ciegas/
 │       └── index.ts
 ├── public/
 │   └── cards/
-│       └── [value]_[suit].png
+│       ├── [value]_[suit].png
+│       └── back.svg
 ├── components.json
 ├── AGENTS.md
 └── package.json
 ```
 
-## Supabase Setup (Phase 4 - Pending)
+## Supabase Setup
 
 ```sql
 -- Enable UUID extension
@@ -150,14 +197,21 @@ CREATE TABLE profiles (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Games table
+-- Games table with state persistence fields
 CREATE TABLE games (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   misses INTEGER NOT NULL CHECK (misses >= 0),
   total_cards INTEGER NOT NULL DEFAULT 40,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  deck JSONB NOT NULL,
+  current_card_index INTEGER NOT NULL DEFAULT 0,
+  game_status TEXT NOT NULL DEFAULT 'in_progress' CHECK (game_status IN ('in_progress', 'completed', 'abandoned')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Index for finding active games quickly
+CREATE INDEX idx_games_user_active ON games(user_id) WHERE game_status = 'in_progress';
 
 -- RLS Policies
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;

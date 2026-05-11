@@ -1,13 +1,18 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useGame } from "@/hooks/useGame"
 import { CardTable } from "@/components/CardTable"
 import { PredictionButtons } from "@/components/PredictionButtons"
 import { ScoreDisplay } from "@/components/ScoreDisplay"
+import { GameEndModal } from "@/components/GameEndModal"
+import { QuitConfirmation } from "@/components/QuitConfirmation"
 import { Button } from "@/components/ui/button"
-import { RotateCcw } from "lucide-react"
+import { LogOut } from "lucide-react"
 
 export default function GamePage() {
+  const router = useRouter()
   const {
     currentCard,
     nextCard,
@@ -18,15 +23,57 @@ export default function GamePage() {
     highScore,
     makePrediction,
     startNewGame,
-    gameResult
+    abandonGame,
+    gameResult,
+    isHydrated
   } = useGame()
 
+  const [showQuitDialog, setShowQuitDialog] = useState(false)
+  const [showEndModal, setShowEndModal] = useState(false)
+
+  const handleAbandon = () => {
+    setShowQuitDialog(true)
+  }
+
+  const confirmAbandon = () => {
+    abandonGame()
+    setShowQuitDialog(false)
+    router.push('/')
+  }
+
+  const handleNewGame = () => {
+    setShowEndModal(false)
+    startNewGame()
+  }
+
+  const handleGoHome = () => {
+    setShowEndModal(false)
+    router.push('/')
+  }
+
+  useEffect(() => {
+    if (isGameOver && totalCards > 0 && cardsRemaining <= 0) {
+      const timer = setTimeout(() => {
+        setShowEndModal(true)
+      }, 800)
+      return () => clearTimeout(timer)
+    }
+  }, [isGameOver, totalCards, cardsRemaining])
+
+  if (!isHydrated) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">Cargando...</div>
+      </main>
+    )
+  }
+
   return (
-    <main className="min-h-screen bg-background flex flex-col px-4 py-6 sm:items-center sm:justify-center sm:py-8">
-      <div className="w-full sm:max-w-lg space-y-6">
+    <main className="min-h-screen bg-background flex flex-col px-4 py-4 sm:items-center sm:justify-center sm:py-8">
+      <div className="w-full sm:max-w-lg space-y-4">
         <header className="text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">A Ciegas</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">Adivina si la siguiente carta es Mayor, Menor o Igual</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">A Ciegas</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Mayor, Menor o Igual</p>
         </header>
 
         <CardTable
@@ -49,19 +96,42 @@ export default function GamePage() {
           isGameOver={isGameOver}
         />
 
-        {isGameOver && (
+        {isGameOver && totalCards === 40 && (
           <div className="flex justify-center">
             <Button
-              onClick={startNewGame}
+              onClick={() => setShowEndModal(true)}
               size="lg"
               className="font-semibold"
             >
-              <RotateCcw className="size-4" />
-              Nueva Partida
+              Ver Resultados
+            </Button>
+          </div>
+        )}
+
+        {!isGameOver && (
+          <div className="pt-4">
+            <Button variant="ghost" onClick={handleAbandon} className="w-full text-muted-foreground hover:text-foreground">
+              <LogOut className="size-4" />
+              Salir de la partida
             </Button>
           </div>
         )}
       </div>
+
+      <QuitConfirmation
+        open={showQuitDialog}
+        onOpenChange={setShowQuitDialog}
+        onConfirm={confirmAbandon}
+      />
+
+      <GameEndModal
+        open={showEndModal}
+        onOpenChange={setShowEndModal}
+        misses={misses}
+        highScore={highScore}
+        onNewGame={handleNewGame}
+        onGoHome={handleGoHome}
+      />
     </main>
   )
 }

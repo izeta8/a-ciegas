@@ -14,30 +14,47 @@ interface UseGameReturn {
   highScore: number | null
   makePrediction: (prediction: Prediction) => void
   startNewGame: () => void
+  abandonGame: () => void
   gameResult: { isCorrect: boolean; prediction: Prediction; result: 'mayor' | 'menor' | 'igual' } | null
+  isHydrated: boolean
 }
 
 export function useGame(): UseGameReturn {
-  const [gameState, setGameState] = useState<GameState>(() => {
-    const deck = shuffleDeck(createDeck())
-    return {
-      deck,
-      currentCardIndex: 0,
-      misses: 0,
-      isGameOver: false,
-      prediction: null
-    }
+  const [isHydrated, setIsHydrated] = useState(false)
+  const [gameState, setGameState] = useState<GameState>({
+    deck: [],
+    currentCardIndex: 0,
+    misses: 0,
+    isGameOver: false,
+    prediction: null
   })
   const [highScore, setHighScore] = useState<number | null>(null)
   const [gameResult, setGameResult] = useState<{ isCorrect: boolean; prediction: Prediction; result: 'mayor' | 'menor' | 'igual' } | null>(null)
 
   useEffect(() => {
+    const deck = shuffleDeck(createDeck())
+    setGameState({
+      deck,
+      currentCardIndex: 0,
+      misses: 0,
+      isGameOver: false,
+      prediction: null
+    })
+    
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) setHighScore(parseInt(stored, 10))
+    
+    setIsHydrated(true)
   }, [])
 
   const currentCard = gameState.deck[gameState.currentCardIndex] || null
   const nextCard = gameState.deck[gameState.currentCardIndex + 1] || null
+
+  useEffect(() => {
+    if (!nextCard && gameState.deck.length > 0 && !gameState.isGameOver) {
+      setGameState(prev => ({ ...prev, isGameOver: true }))
+    }
+  }, [nextCard, gameState.deck.length, gameState.isGameOver])
 
   const makePrediction = useCallback((prediction: Prediction) => {
     if (!nextCard || gameState.isGameOver) return
@@ -79,6 +96,16 @@ export function useGame(): UseGameReturn {
     setGameResult(null)
   }, [])
 
+  const abandonGame = useCallback(() => {
+    setGameState({
+      deck: [],
+      currentCardIndex: 0,
+      misses: 0,
+      isGameOver: true,
+      prediction: null
+    })
+  }, [])
+
   return {
     currentCard,
     nextCard,
@@ -89,6 +116,8 @@ export function useGame(): UseGameReturn {
     highScore,
     makePrediction,
     startNewGame,
-    gameResult
+    abandonGame,
+    gameResult,
+    isHydrated
   }
 }

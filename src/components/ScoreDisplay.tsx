@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
-import { Card, CardContent } from "@/components/ui/card"
 import { XCircle, Trophy } from "lucide-react"
 
 interface ScoreDisplayProps {
@@ -63,19 +62,6 @@ export function ScoreDisplay({ misses, cardsRemaining, totalCards, highScore, ga
           >
             {gameResult.isCorrect ? 'Correcto!' : 'Falla!'}
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isGameOver && (
-          <Card className="mt-4 mx-4 sm:mx-0">
-            <CardContent className="pt-6 text-center">
-              <h2 className="text-xl sm:text-2xl font-bold mb-2">Juego Terminado</h2>
-              <p className="text-base sm:text-lg text-muted-foreground">
-                Fallas totales: <span className="font-bold text-foreground">{misses}</span>
-              </p>
-            </CardContent>
-          </Card>
         )}
       </AnimatePresence>
     </div>
