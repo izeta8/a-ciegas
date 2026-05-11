@@ -13,17 +13,17 @@ interface CardTableProps {
 
 export function CardTable({ currentCard, nextCard, showNext = true }: CardTableProps) {
   return (
-    <div className="flex items-center justify-center gap-4 md:gap-8 py-8">
+    <div className="flex flex-col items-center gap-3 py-4 sm:flex-row sm:justify-center sm:gap-4 overflow-x-auto">
       <AnimatePresence mode="wait">
         {currentCard && (
           <motion.div
             key={currentCard.value + currentCard.suit + "current"}
-            initial={{ x: -100, opacity: 0, rotateY: 180 }}
+            initial={{ x: -50, opacity: 0, rotateY: 180 }}
             animate={{ x: 0, opacity: 1, rotateY: 0 }}
-            exit={{ x: -100, opacity: 0 }}
+            exit={{ x: -50, opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <CardComponent card={currentCard} size="lg" />
+            <CardComponent card={currentCard} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -35,18 +35,18 @@ export function CardTable({ currentCard, nextCard, showNext = true }: CardTableP
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <ChevronRight className="w-8 h-8 text-slate-400" />
+            <ChevronRight className="size-6 sm:size-8 text-muted-foreground rotate-90 sm:rotate-0" />
           </motion.div>
 
           <AnimatePresence mode="wait">
             <motion.div
               key={nextCard.value + nextCard.suit + "next"}
-              initial={{ x: 100, opacity: 0, rotateY: 180 }}
+              initial={{ x: 50, opacity: 0, rotateY: 180 }}
               animate={{ x: 0, opacity: 1, rotateY: 0 }}
-              exit={{ x: 100, opacity: 0 }}
+              exit={{ x: 50, opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <CardComponent card={nextCard} size="lg" faceDown />
+              <CardComponent card={nextCard} faceDown />
             </motion.div>
           </AnimatePresence>
         </>

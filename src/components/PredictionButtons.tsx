@@ -12,43 +12,37 @@ interface PredictionButtonsProps {
 
 export function PredictionButtons({ onPredict, disabled = false }: PredictionButtonsProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+    <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-row sm:gap-3">
+      <motion.div whileTap={{ scale: 0.95 }}>
         <Button
           onClick={() => onPredict('menor')}
           disabled={disabled}
           variant="outline"
-          size="lg"
-          className="w-full sm:w-40 h-14 text-lg font-semibold border-2 hover:border-blue-500 hover:bg-blue-50"
+          className="w-full h-14 text-base sm:w-36 sm:h-16 sm:text-lg font-medium"
         >
-          <ArrowDown className="w-5 h-5 mr-2" />
-          Menor
+          <ArrowDown className="size-4 sm:size-5" />
         </Button>
       </motion.div>
 
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <motion.div whileTap={{ scale: 0.95 }}>
         <Button
           onClick={() => onPredict('igual')}
           disabled={disabled}
           variant="outline"
-          size="lg"
-          className="w-full sm:w-40 h-14 text-lg font-semibold border-2 hover:border-purple-500 hover:bg-purple-50"
+          className="w-full h-14 text-base sm:w-36 sm:h-16 sm:text-lg font-medium"
         >
-          <Equal className="w-5 h-5 mr-2" />
-          Igual
+          <Equal className="size-4 sm:size-5" />
         </Button>
       </motion.div>
 
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+      <motion.div whileTap={{ scale: 0.95 }}>
         <Button
           onClick={() => onPredict('mayor')}
           disabled={disabled}
           variant="outline"
-          size="lg"
-          className="w-full sm:w-40 h-14 text-lg font-semibold border-2 hover:border-red-500 hover:bg-red-50"
+          className="w-full h-14 text-base sm:w-36 sm:h-16 sm:text-lg font-medium"
         >
-          <ArrowUp className="w-5 h-5 mr-2" />
-          Mayor
+          <ArrowUp className="size-4 sm:size-5" />
         </Button>
       </motion.div>
     </div>

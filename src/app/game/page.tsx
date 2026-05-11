@@ -22,11 +22,11 @@ export default function GamePage() {
   } = useGame()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl space-y-8">
+    <main className="min-h-screen bg-background flex flex-col px-4 py-6 sm:items-center sm:justify-center sm:py-8">
+      <div className="w-full sm:max-w-lg space-y-6">
         <header className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">A Ciegas</h1>
-          <p className="text-slate-400">Adivina si la siguiente carta es Mayor, Menor o Igual</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">A Ciegas</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">Adivina si la siguiente carta es Mayor, Menor o Igual</p>
         </header>
 
         <CardTable
@@ -54,14 +54,14 @@ export default function GamePage() {
             <Button
               onClick={startNewGame}
               size="lg"
-              className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold"
+              className="font-semibold"
             >
-              <RotateCcw className="w-5 h-5 mr-2" />
+              <RotateCcw className="size-4" />
               Nueva Partida
             </Button>
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }

@@ -22,6 +22,13 @@
 | Backend | Supabase (Auth + PostgreSQL) |
 | Auth Provider | Google OAuth |
 
+**Design Philosophy: Mobile-First**
+- **Primary target:** Mobile devices (375px+ width)
+- **Secondary:** Desktop/tablet (optimized but not prioritized)
+- Always design and implement for mobile first, then scale up
+- Use responsive utilities (`sm:`, `md:`, `lg:`) to enhance for larger screens
+- Test mobile experience before desktop enhancements
+
 **Naming Conventions:**
 - Components: PascalCase (CardTable.tsx)
 - Hooks: camelCase with use prefix (useGame.ts)
@@ -64,9 +71,9 @@
 ### DONE
 - [x] Phase 1: Setup Next.js, Shadcn, and AGENTS.md
 - [x] Phase 2: Core game engine (deck, shuffling, comparison logic)
-- [x] Phase 3: Visual polish (Framer Motion card animations)
+- [x] Phase 3: Visual polish (Framer Motion card animations, mobile-first responsive design)
 - [ ] Phase 4: Supabase auth and scoreboard
-- [ ] Phase 5: Polish (sound effects, responsive design)
+- [ ] Phase 5: Polish (sound effects, desktop optimizations)
 
 ## Card Asset Mapping
 

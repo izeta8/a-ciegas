@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
+import { Card, CardContent } from "@/components/ui/card"
 import { XCircle, Trophy } from "lucide-react"
 
 interface ScoreDisplayProps {
@@ -18,47 +19,47 @@ export function ScoreDisplay({ misses, cardsRemaining, totalCards, highScore, ga
 
   return (
     <div className="space-y-4 text-center">
-      <div className="flex justify-center gap-8">
+      <div className="flex justify-center gap-6 sm:gap-10">
         <div className="flex flex-col items-center">
-          <span className="text-sm text-slate-500">Fallas</span>
+          <span className="text-xs sm:text-sm text-muted-foreground">Fallas</span>
           <motion.div
             key={misses}
-            initial={{ scale: 1.5 }}
+            initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}
-            className="flex items-center gap-1 text-3xl font-bold text-red-500"
+            className="flex items-center gap-1 text-2xl sm:text-3xl font-bold"
           >
-            <XCircle className="w-6 h-6" />
+            <XCircle className="size-5 sm:size-6 text-destructive" />
             {misses}
           </motion.div>
         </div>
 
         <div className="flex flex-col items-center">
-          <span className="text-sm text-slate-500">Cartas</span>
-          <div className="text-3xl font-bold text-slate-700">
+          <span className="text-xs sm:text-sm text-muted-foreground">Cartas</span>
+          <div className="text-2xl sm:text-3xl font-bold">
             {totalCards - cardsRemaining}/{totalCards}
           </div>
         </div>
 
         {highScore !== null && (
           <div className="flex flex-col items-center">
-            <span className="text-sm text-slate-500">Mejor</span>
-            <div className="flex items-center gap-1 text-3xl font-bold text-yellow-600">
-              <Trophy className="w-6 h-6" />
+            <span className="text-xs sm:text-sm text-muted-foreground">Mejor</span>
+            <div className="flex items-center gap-1 text-2xl sm:text-3xl font-bold text-yellow-600">
+              <Trophy className="size-5 sm:size-6" />
               {highScore}
             </div>
           </div>
         )}
       </div>
 
-      <Progress value={progress} className="w-full max-w-md mx-auto" />
+      <Progress value={progress} className="w-full max-w-xs sm:max-w-md mx-auto h-2" />
 
       <AnimatePresence>
         {gameResult && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`text-2xl font-bold ${gameResult.isCorrect ? 'text-green-500' : 'text-red-500'}`}
+            exit={{ opacity: 0, y: -10 }}
+            className={`text-lg sm:text-xl font-semibold ${gameResult.isCorrect ? 'text-green-600' : 'text-destructive'}`}
           >
             {gameResult.isCorrect ? 'Correcto!' : 'Falla!'}
           </motion.div>
@@ -67,16 +68,14 @@ export function ScoreDisplay({ misses, cardsRemaining, totalCards, highScore, ga
 
       <AnimatePresence>
         {isGameOver && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-6 p-6 bg-slate-900 text-white rounded-xl"
-          >
-            <h2 className="text-3xl font-bold mb-2">Juego Terminado</h2>
-            <p className="text-xl">
-              Fallas totales: <span className="text-yellow-400 font-bold">{misses}</span>
-            </p>
-          </motion.div>
+          <Card className="mt-4 mx-4 sm:mx-0">
+            <CardContent className="pt-6 text-center">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">Juego Terminado</h2>
+              <p className="text-base sm:text-lg text-muted-foreground">
+                Fallas totales: <span className="font-bold text-foreground">{misses}</span>
+              </p>
+            </CardContent>
+          </Card>
         )}
       </AnimatePresence>
     </div>
