@@ -36,6 +36,32 @@
 - CSS classes: Tailwind utility classes
 - File paths: kebab-case for folders, PascalCase for React files
 
+## Authentication (Phase 4 - Complete)
+
+### Implementation
+- **Auth Provider:** `AuthProvider` context wrapper in `src/lib/auth.tsx`
+- **Google OAuth:** Configured in Supabase Dashboard → Authentication → Providers → Google
+- **Callback handling:** `src/app/auth/callback/route.ts`
+- **Login page:** `src/app/auth/login/page.tsx`
+- **Middleware:** `src/middleware.ts` for route protection
+
+### Auth Flow
+```
+User clicks "Iniciar sesión" → signInWithOAuth() → Google → 
+Callback at /auth/callback → Exchange code for session → Redirect to /game
+```
+
+### Protected Routes
+- `/game` - Requires authentication (enforced by middleware)
+- `/auth/login` - Public login page
+- `/auth/callback` - OAuth callback handler
+
+### Environment Variables
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://ipzkvwfoyzukglbsqoyl.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+```
+
 ## Database Schema (Supabase)
 
 ### profiles
@@ -73,7 +99,7 @@
 ### Game Session Rules
 1. **Anonymous users**: Game state is stored in localStorage. Leaving the page clears the session.
 2. **Authenticated users**: Game state is persisted to Supabase. Users can resume from where they left off.
-3. **Abandoning a game**: If a user clicks "Abandonar" (quit), the game is marked as `abandoned` and deleted. They start fresh next time.
+3. **Abandoning a game**: If a user clicks "Salir de la partida" (quit), the game is marked as `abandoned` and deleted. They start fresh next time.
 4. **Completing a game**: When deck is exhausted, game is marked as `completed` and score is recorded.
 5. **Only one active game**: Users can only have ONE game in `in_progress` status at a time.
 
@@ -99,8 +125,9 @@ When a game ends (deck exhausted):
 ## Current Roadmap
 
 ### TODO
-- [ ] Phase 4: Supabase integration (Auth + Database + State Persistence)
-- [ ] Phase 5: Sound effects and haptic feedback
+- [ ] Phase 4.5: Game state persistence to Supabase (save/resume games)
+- [ ] Phase 5: Leaderboard / scoreboard
+- [ ] Phase 6: Sound effects and haptic feedback
 
 ### DOING
 - [ ] 
@@ -110,8 +137,7 @@ When a game ends (deck exhausted):
 - [x] Phase 2: Core game engine (deck, shuffling, comparison logic)
 - [x] Phase 3: Visual polish (Framer Motion card animations, mobile-first responsive design, Fournier card back)
 - [x] Phase 3.5: Game flow improvements (abandon button, game end UX)
-- [ ] Phase 4: Supabase auth and scoreboard
-- [ ] Phase 5: Polish (sound effects, desktop optimizations)
+- [x] Phase 4: Supabase auth (Google OAuth) and database schema
 
 ## Card Asset Mapping
 
@@ -152,11 +178,15 @@ a-ciegas/
 │   │   ├── layout.tsx
 │   │   ├── page.tsx (Home)
 │   │   ├── game/page.tsx
+│   │   ├── auth/
+│   │   │   ├── login/page.tsx
+│   │   │   └── callback/route.ts
 │   │   └── globals.css
 │   ├── components/
 │   │   ├── ui/
 │   │   │   ├── button.tsx
 │   │   │   ├── card.tsx
+│   │   │   ├── alert-dialog.tsx
 │   │   │   └── progress.tsx
 │   │   ├── Card.tsx
 │   │   ├── CardTable.tsx
@@ -167,11 +197,13 @@ a-ciegas/
 │   ├── hooks/
 │   │   └── useGame.ts
 │   ├── lib/
+│   │   ├── auth.tsx (AuthProvider)
 │   │   ├── utils.ts
 │   │   ├── deck.ts
 │   │   └── supabase/
 │   │       ├── client.ts
 │   │       └── server.ts
+│   ├── middleware.ts
 │   └── types/
 │       └── index.ts
 ├── public/

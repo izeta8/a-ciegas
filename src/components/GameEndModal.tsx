@@ -39,8 +39,8 @@ export function GameEndModal({ open, onOpenChange, misses, highScore, onNewGame,
               <Trophy className="size-8 text-primary-foreground" />
             </div>
           </motion.div>
-          <AlertDialogTitle className="text-2xl font-bold">Juego Terminado</AlertDialogTitle>
-          <AlertDialogDescription className="text-base">
+          <AlertDialogTitle className="text-2xl font-bold text-center">Juego Terminado</AlertDialogTitle>
+          <AlertDialogDescription className="text-base text-center">
             {getMessage()}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -73,15 +73,15 @@ export function GameEndModal({ open, onOpenChange, misses, highScore, onNewGame,
           )}
         </motion.div>
 
-        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+        <AlertDialogFooter className="flex-col gap-2">
           <AlertDialogCancel asChild>
-            <Button variant="outline" onClick={onGoHome} className="w-full sm:w-auto">
+            <Button variant="outline" onClick={onGoHome} className="w-full">
               <Home className="size-4" />
               Inicio
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button onClick={onNewGame} className="w-full sm:w-auto">
+            <Button onClick={onNewGame} className="w-full">
               <RotateCcw className="size-4" />
               Nueva Partida
             </Button>
