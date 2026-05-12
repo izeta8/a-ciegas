@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Trophy, XCircle, RotateCcw, Home } from "lucide-react"
+import { Trophy, XCircle, RotateCcw, Home, TrophyIcon } from "lucide-react"
+import Link from "next/link"
 
 interface GameEndModalProps {
   open: boolean
@@ -74,6 +75,12 @@ export function GameEndModal({ open, onOpenChange, misses, highScore, onNewGame,
         </motion.div>
 
         <AlertDialogFooter className="flex-col gap-2">
+          <Link href="/leaderboard" className="w-full">
+            <Button variant="secondary" className="w-full">
+              <TrophyIcon className="size-4" />
+              Clasificación
+            </Button>
+          </Link>
           <AlertDialogCancel asChild>
             <Button variant="outline" onClick={onGoHome} className="w-full">
               <Home className="size-4" />

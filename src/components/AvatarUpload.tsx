@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState, useRef, useCallback } from "react"
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop"
 import { createClient } from "@/lib/supabase/client"
@@ -195,11 +196,13 @@ export function AvatarUpload({ currentAvatarUrl, onAvatarUpdate, username }: Ava
               aspect={1}
               circularCrop
             >
-              <img
+              <Image
                 src={preview}
                 alt="Preview"
                 onLoad={onImageLoad}
                 className="max-h-64 mx-auto"
+                width={256}
+                height={256}
               />
             </ReactCrop>
           </div>

@@ -20,7 +20,7 @@ export default function ProfilePage() {
   const { user, isLoading: authLoading } = useAuth()
   const supabase = createClient()
 
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)

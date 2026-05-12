@@ -13,7 +13,7 @@ interface ScoreDisplayProps {
   isGameOver: boolean
 }
 
-export function ScoreDisplay({ misses, cardsRemaining, totalCards, highScore, gameResult, isGameOver }: ScoreDisplayProps) {
+export function ScoreDisplay({ misses, cardsRemaining, totalCards, highScore, gameResult }: ScoreDisplayProps) {
   const progress = ((totalCards - cardsRemaining) / totalCards) * 100
 
   return (

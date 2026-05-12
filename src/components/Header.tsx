@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
@@ -19,7 +19,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
-import { User } from "lucide-react"
+import { User, Users } from "lucide-react"
 
 type Profile = {
   id: string
@@ -29,27 +29,27 @@ type Profile = {
 
 export function Header() {
   const { user, isLoading: authLoading, signInWithGoogle, signOut } = useAuth()
-  const supabase = createClient()
   const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
+  const supabaseRef = useRef(createClient())
+  const userIdRef = useRef<string | null>(user?.id)
 
   useEffect(() => {
-    if (!user) {
-      setProfile(null)
-      return
-    }
+    userIdRef.current = user?.id ?? null
+  }, [user?.id])
 
-    const fetchProfile = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("avatar_url, username")
-        .eq("id", user.id)
-        .single()
-      setProfile(data)
-    }
+  useEffect(() => {
+    const userId = userIdRef.current
+    if (!userId) return
 
-    fetchProfile()
-  }, [user, supabase])
+    const supabase = supabaseRef.current
+    supabase
+      .from("profiles")
+      .select("id, avatar_url, username")
+      .eq("id", userId)
+      .single()
+      .then(({ data }) => setProfile(data ?? null))
+  }, [])
 
   const userInitials = profile?.username
     ? profile.username.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
@@ -74,53 +74,64 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-      <div className="flex h-14 items-center justify-between px-4 z-50">
-        <span className="text-lg font-semibold">A Ciegas</span>
-        
-        {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 h-auto py-1 px-2 rounded-full">
-                <span className="text-sm font-medium hidden sm:inline">{displayName}</span>
-                <Avatar className="h-9 w-9">
-                  <AvatarImage 
-                    src={profile?.avatar_url || user.user_metadata?.avatar_url} 
-                    alt={displayName} 
-                  />
-                  <AvatarFallback>{userInitials}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {displayName}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user.email}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <Link href="/profile" className="flex items-center gap-2">
-                  <User className="size-4" />
-                  Mi Perfil
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                Cerrar sesión
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Button onClick={signInWithGoogle} size="sm">
-            Iniciar sesión
-          </Button>
-        )}
+    <header className="sticky top-0 z-50 w-full border-b bg-white backdrop-blur">
+      <div className="flex h-14 items-center px-4 z-50">
+        <span className="text-lg font-semibold shrink-0">A Ciegas</span>
+
+        <nav className="flex-1 flex justify-center gap-2">
+          <Link href="/players">
+            <Button variant="ghost" size="sm" className="gap-1.5">
+              <Users className="size-4" />
+              <span>Jugadores</span>
+            </Button>
+          </Link>
+        </nav>
+
+        <div className="shrink-0 bg-white">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className="bg-white">
+                <Button variant="ghost" className="flex items-center gap-2 h-auto py-1 px-2 rounded-full">
+                  <span className="text-sm font-medium hidden sm:inline">{displayName}</span>
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={profile?.avatar_url || user.user_metadata?.avatar_url}
+                      alt={displayName}
+                    />
+                    <AvatarFallback>{userInitials}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {displayName}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/profile" className="flex items-center gap-2">
+                    <User className="size-4" />
+                    Mi Perfil
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={signInWithGoogle} size="sm">
+              Iniciar sesión
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   )

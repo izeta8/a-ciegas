@@ -82,6 +82,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 | deck | jsonb | NOT NULL, contains Card[] array |
 | current_card_index | integer | NOT NULL, DEFAULT 0 |
 | game_status | text | NOT NULL, DEFAULT 'in_progress' (values: 'in_progress', 'completed', 'abandoned') |
+| cards_played | integer | NOT NULL, DEFAULT 0 |
+| cards_correct | integer | NOT NULL, DEFAULT 0 |
 | created_at | timestamptz | DEFAULT now() |
 | updated_at | timestamptz | DEFAULT now() |
 
@@ -125,12 +127,10 @@ When a game ends (deck exhausted):
 ## Current Roadmap
 
 ### TODO
-- [ ] Phase 4.5: Game state persistence to Supabase (save/resume games)
-- [ ] Phase 5: Leaderboard / scoreboard
 - [ ] Phase 6: Sound effects and haptic feedback
 
 ### DOING
-- [ ] 
+- [ ]
 
 ### DONE
 - [x] Phase 1: Setup Next.js, Shadcn, and AGENTS.md
@@ -138,6 +138,9 @@ When a game ends (deck exhausted):
 - [x] Phase 3: Visual polish (Framer Motion card animations, mobile-first responsive design, Fournier card back)
 - [x] Phase 3.5: Game flow improvements (abandon button, game end UX)
 - [x] Phase 4: Supabase auth (Google OAuth) and database schema
+- [x] Phase 4.5: Game state persistence to Supabase (save/resume games)
+- [x] Phase 5: Leaderboard / scoreboard
+- [x] Phase 7: Players list and player profiles with game history
 
 ## Card Asset Mapping
 
@@ -178,6 +181,11 @@ a-ciegas/
 │   │   ├── layout.tsx
 │   │   ├── page.tsx (Home)
 │   │   ├── game/page.tsx
+│   │   ├── leaderboard/page.tsx
+│   │   ├── profile/page.tsx
+│   │   ├── players/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/page.tsx
 │   │   ├── auth/
 │   │   │   ├── login/page.tsx
 │   │   │   └── callback/route.ts

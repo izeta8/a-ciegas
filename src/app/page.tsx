@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/lib/auth"
-import { Play, Trophy, Sparkles, LogOut, User } from "lucide-react"
+import { Play, Trophy, Sparkles, LogOut } from "lucide-react"
 
 export default function HomePage() {
   const { user, signOut, signInWithGoogle, isLoading } = useAuth()
@@ -28,16 +28,9 @@ export default function HomePage() {
             A Ciegas
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground">
-            El juego de cartas español de intuición
+            El juego de cartas de intuición
           </p>
         </div>
-
-        {user && (
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <User className="size-4" />
-            {user.user_metadata?.full_name || user.email}
-          </div>
-        )}
 
         <Card>
           <CardHeader>
@@ -88,10 +81,12 @@ export default function HomePage() {
             </Button>
           )}
 
-          <Button variant="ghost" size="lg" className="w-full" disabled>
-            <Trophy className="size-4" />
-            Clasificación
-          </Button>
+          <Link href="/leaderboard">
+            <Button variant="outline" size="lg" className="w-full">
+              <Trophy className="size-4" />
+              Clasificación
+            </Button>
+          </Link>
         </div>
       </div>
     </main>
