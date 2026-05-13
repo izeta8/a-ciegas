@@ -75,16 +75,14 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ### games
 | Column | Type | Constraints |
 |--------|------|-------------|
-| id | uuid | PRIMARY KEY, DEFAULT gen_random_uuid() |
+| id | uuid | PRIMARY KEY, DEFAULT uuid_generate_v4() |
 | user_id | uuid | REFERENCES profiles(id), RLS policy |
 | misses | integer | NOT NULL, CHECK >= 0 |
 | total_cards | integer | NOT NULL, DEFAULT 40 |
-| deck | jsonb | NOT NULL, contains Card[] array |
+| completed_at | timestamptz | NULLABLE |
+| deck | jsonb | NOT NULL |
 | current_card_index | integer | NOT NULL, DEFAULT 0 |
 | game_status | text | NOT NULL, DEFAULT 'in_progress' (values: 'in_progress', 'completed', 'abandoned') |
-| cards_played | integer | NOT NULL, DEFAULT 0 |
-| cards_correct | integer | NOT NULL, DEFAULT 0 |
-| created_at | timestamptz | DEFAULT now() |
 | updated_at | timestamptz | DEFAULT now() |
 
 **Game Status Values:**
@@ -243,10 +241,10 @@ CREATE TABLE games (
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   misses INTEGER NOT NULL CHECK (misses >= 0),
   total_cards INTEGER NOT NULL DEFAULT 40,
-  deck JSONB NOT NULL,
+  completed_at TIMESTAMPTZ NULLABLE,
+  deck JSONB NOT NULL DEFAULT '[]'::jsonb,
   current_card_index INTEGER NOT NULL DEFAULT 0,
   game_status TEXT NOT NULL DEFAULT 'in_progress' CHECK (game_status IN ('in_progress', 'completed', 'abandoned')),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
